@@ -2,7 +2,13 @@
 
 import { ChevronDown, Tag } from "lucide-react";
 
-const NAV_ITEMS = [
+interface NavItem {
+  label: string;
+  href: string;
+  hasDropdown: boolean;
+}
+
+export const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/", hasDropdown: true },
   { label: "Categories", href: "/categories", hasDropdown: true },
   { label: "Products", href: "/products", hasDropdown: true },
@@ -14,21 +20,24 @@ const NAV_ITEMS = [
 
 export default function Navbar() {
   return (
-    <div className="w-full bg-white border-b border-gray-200">
-      <div className="max-w-[1540px] mx-auto px-8 flex items-center justify-between">
-        
+    <div className="hidden lg:block w-full bg-white border-b border-gray-200">
+      <div className="max-w-[1540px] mx-auto px-4 md:px-8 flex items-center justify-between overflow-x-auto no-scrollbar">
         {/* Left nav */}
-        <div className="flex items-center">
+        <div className="flex items-center whitespace-nowrap">
           {NAV_ITEMS.map((item) => (
             <a
               key={item.label}
               href={item.href}
               className={`relative px-4 py-3.5 text-[14px] font-medium cursor-pointer flex items-center gap-1 transition-colors ${
-                item.label === "Home" ? "text-[#1565C0]" : "text-[#1a1a1a] hover:text-[#1565C0]"
+                item.label === "Home"
+                  ? "text-[#1565C0]"
+                  : "text-[#1a1a1a] hover:text-[#1565C0]"
               }`}
             >
               {item.label}
-              {item.hasDropdown && <ChevronDown size={13} strokeWidth={2} className="opacity-70" />}
+              {item.hasDropdown && (
+                <ChevronDown size={13} strokeWidth={2} className="opacity-70" />
+              )}
               {item.label === "Home" && (
                 <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#1565C0]" />
               )}

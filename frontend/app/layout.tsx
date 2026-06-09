@@ -7,7 +7,8 @@ import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "Riode | Modern Online Shopping",
-  description: "Discover premium products with an exceptional shopping experience.",
+  description:
+    "Discover premium products with an exceptional shopping experience.",
 };
 
 export default function RootLayout({
@@ -16,17 +17,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="w-full" suppressHydrationWarning>
-      <body className="w-full m-0 p-0 overflow-x-hidden" suppressHydrationWarning>
-        <div className="page-wrapper flex flex-col min-h-screen">
+    <html
+      lang="en"
+      className="w-full overflow-x-hidden"
+      suppressHydrationWarning
+    >
+      <body
+        className="w-full m-0 p-0 overflow-x-hidden"
+        suppressHydrationWarning
+      >
+        <div className="page-wrapper flex flex-col min-h-screen min-w-0">
           <header id="site-header" className="w-full">
             <TopBar />
             <MainHeader />
-            <Navbar />
+            <Navbar /> {/* Navbar is hidden on mobile via CSS */}
           </header>
-          <main className="w-full m-0 p-0 overflow-x-hidden">
-            {children}
-          </main>
+          <main className="w-full m-0 p-0 overflow-x-hidden">{children}</main>
           <Footer />
         </div>
       </body>

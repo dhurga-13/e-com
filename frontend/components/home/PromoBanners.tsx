@@ -3,8 +3,8 @@ import Image from "next/image";
 
 export default function PromoBanners() {
   return (
-    <section className="w-full py-0">
-      <div className="max-w-[1540px] mx-auto px-8">
+    <section className="w-full py-0 overflow-hidden">
+      <div className="max-w-[1540px] mx-auto px-4 md:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Banner 1 */}
           <div className="relative w-full aspect-[2/1] bg-gray-200 overflow-hidden group cursor-pointer">
@@ -12,10 +12,13 @@ export default function PromoBanners() {
               src="/banners/banner-1.jpg"
               alt="Men's Sportswear"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              quality={90}
               className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
-            <div className="absolute inset-0 bg-black/5" />
-            <div className="absolute inset-0 flex flex-col justify-center p-10 md:p-14">
+            <div className="absolute inset-0 bg-black/5" />{" "}
+            {/* Adjusted padding for mobile */}
+            <div className="absolute inset-0 flex flex-col justify-center p-4 sm:p-6 md:p-10">
               <span className="text-[14px] font-bold text-gray-500 uppercase tracking-widest mb-1">
                 New Arrivals
               </span>
@@ -39,10 +42,13 @@ export default function PromoBanners() {
               src="/banners/banner-2.jpg"
               alt="Women's Dresses"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              quality={90}
               className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
-            <div className="absolute inset-0 bg-black/5" />
-            <div className="absolute inset-0 flex flex-col justify-center items-end text-right p-10 md:p-14">
+            <div className="absolute inset-0 bg-black/5" />{" "}
+            {/* Adjusted padding for mobile */}
+            <div className="absolute inset-0 flex flex-col justify-center items-end text-right p-4 sm:p-6 md:p-10">
               <span className="text-[14px] font-bold text-gray-500 uppercase tracking-widest mb-1">
                 Top Rated
               </span>

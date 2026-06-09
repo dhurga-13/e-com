@@ -21,6 +21,8 @@ export default function MiniProductCard({
           src={product.image}
           alt={product.name}
           fill
+          sizes="84px"
+          quality={90}
           className="object-cover transition-transform duration-300 group-hover:scale-110"
         />
       </div>

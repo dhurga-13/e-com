@@ -1,73 +1,149 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown, User } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ChevronDown, CircleHelp, MapPin, User } from "lucide-react";
 
-export default function TopBar() {
-  const [openCurrency, setOpenCurrency] = useState(false);
-  const [openLanguage, setOpenLanguage] = useState(false);
+interface DropdownProps {
+  label: string;
+  options: string[];
+  selected: string;
+  onSelect: (value: string) => void;
+}
+
+function Dropdown({ label, options, selected, onSelect }: DropdownProps) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div className="w-full bg-[#f5f5f5] border-b border-gray-200">
-      <div className="max-w-[1540px] mx-auto px-8 h-9 flex items-center justify-between text-[12px] text-[#666]">
-        
-        {/* LEFT */}
-        <div className="flex items-center">
-          <p>Welcome to Riode store message or remove it!</p>
+    <div className="relative" ref={ref}>
+      <button
+        suppressHydrationWarning
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 text-[14px] font-normal text-[#4b5563] cursor-pointer"
+        aria-expanded={open}
+        aria-label={label}
+        id={`topbar-dropdown-${label.toLowerCase()}`}
+      >
+        {selected}
+        <ChevronDown
+          className={`w-3 h-3 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute top-full right-0 mt-1 min-w-[100px] bg-white border border-[#e5e5e5] rounded shadow-lg z-[100] py-1 animate-fade-in text-[#666]">
+          {options.map((option) => (
+            <button
+              key={option}
+              onClick={() => {
+                onSelect(option);
+                setOpen(false);
+              }}
+              className={`block w-full text-left px-4 py-1.5 text-[12px] font-medium transition-colors duration-150 cursor-pointer ${
+                option === selected
+                  ? "text-[#2d5eff] bg-[#f0f4ff]"
+                  : "text-[#666] hover:text-[#2d5eff] hover:bg-[#f8f9fc]"
+              }`}
+            >
+              {option}
+            </button>
+          ))}
         </div>
+      )}
+    </div>
+  );
+}
 
-        {/* RIGHT */}
-        <div className="flex items-center gap-5">
-          {/* Currency */}
-          <div className="relative">
-            <button
-              onClick={() => setOpenCurrency(!openCurrency)}
-              className="flex items-center gap-1 cursor-pointer hover:text-[#1565C0] transition-colors"
-              suppressHydrationWarning
+export default function TopBar() {
+  const [currency, setCurrency] = useState("USD");
+  const [language, setLanguage] = useState("ENG");
+
+  return (
+    <div
+      className="hidden md:block w-full bg-white border-b border-[#e5e5e5]"
+      id="topbar"
+    >
+      <div className="max-w-[1540px] mx-auto px-4 md:px-8">
+        <div className="flex items-center justify-between h-[50px]">
+          {/* Left — Welcome Message */}
+          <p
+            className="text-[13px] font-normal text-[#4b5563] pr-4"
+            id="topbar-welcome"
+          >
+            Welcome to Riode store message or remove it!
+          </p>
+
+          {/* Right — Utility Links */}
+          <div className="flex items-center h-full justify-end">
+            {/* Currency Dropdown */}
+            <div className="px-3 border-r border-[#ddd]">
+              <Dropdown
+                label="Currency"
+                options={["USD", "EUR"]}
+                selected={currency}
+                onSelect={setCurrency}
+              />
+            </div>
+
+            {/* Language Dropdown */}
+            <div className="px-5 border-r border-[#ddd]">
+              <Dropdown
+                label="Language"
+                options={["ENG", "FRA"]}
+                selected={language}
+                onSelect={setLanguage}
+              />
+            </div>
+
+            {/* Contact */}
+            <a
+              href="/contact"
+              className="group flex items-center gap-2 text-[13px] font-normal text-[#4b5563] px-5 border-r border-[#ddd]"
+              id="topbar-contact"
             >
-              USD
-              <ChevronDown size={11} strokeWidth={2} />
-            </button>
-            {openCurrency && (
-              <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 shadow-md py-1 z-50 min-w-[80px]">
-                <button className="block w-full text-left px-3 py-1 text-[12px] hover:bg-gray-50" suppressHydrationWarning>EUR</button>
-                <button className="block w-full text-left px-3 py-1 text-[12px] hover:bg-gray-50" suppressHydrationWarning>USD</button>
-              </div>
-            )}
-          </div>
+              <MapPin
+                className="w-[19px] h-[19px] text-[#334155]"
+                strokeWidth={1.8}
+              />
+              Contact
+            </a>
 
-          {/* Language */}
-          <div className="relative">
-            <button
-              onClick={() => setOpenLanguage(!openLanguage)}
-              className="flex items-center gap-1 cursor-pointer hover:text-[#1565C0] transition-colors"
-              suppressHydrationWarning
+            {/* Need Help */}
+            <a
+              href="/help"
+              className="group flex items-center gap-2 text-[13px] font-normal text-[#4b5563] px-5 border-r border-[#ddd]"
+              id="topbar-help"
             >
-              ENG
-              <ChevronDown size={11} strokeWidth={2} />
-            </button>
-            {openLanguage && (
-              <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 shadow-md py-1 z-50 min-w-[80px]">
-                <button className="block w-full text-left px-3 py-1 text-[12px] hover:bg-gray-50" suppressHydrationWarning>ENG</button>
-                <button className="block w-full text-left px-3 py-1 text-[12px] hover:bg-gray-50" suppressHydrationWarning>FRA</button>
-              </div>
-            )}
+              <CircleHelp
+                className="w-[19px] h-[19px] text-[#334155]"
+                strokeWidth={1.8}
+              />
+              Need Help
+            </a>
+
+            {/* Sign In / Register */}
+            <a
+              href="/login"
+              className="group flex items-center gap-2 text-[13px] font-normal text-[#4b5563] pl-5"
+              id="topbar-login-register"
+            >
+              <User
+                className="w-[19px] h-[19px] text-[#334155]"
+                strokeWidth={1.7}
+              />
+              <span>Sign in / Register</span>
+            </a>
           </div>
-
-          <div className="w-px h-3.5 bg-gray-400" />
-
-          <a href="/contact" className="flex items-center gap-1 hover:text-[#1565C0] transition-colors">
-            Contact
-          </a>
-
-          <a href="/help" className="flex items-center gap-1 hover:text-[#1565C0] transition-colors">
-            Need Help
-          </a>
-
-          <a href="/login" className="flex items-center gap-1 hover:text-[#1565C0] transition-colors">
-            <User size={13} />
-            Sign in / Register
-          </a>
         </div>
       </div>
     </div>

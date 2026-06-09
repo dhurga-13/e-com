@@ -20,12 +20,12 @@ export default function TrustBadges({ className }: { className?: string }) {
   ];
 
   return (
-    <div className={`container-main mx-auto px-6 ${className || ""}`}>
-      <div className="grid grid-cols-1 lg:grid-cols-3 border border-gray-200 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white divide-y lg:divide-y-0 lg:divide-x divide-gray-100 overflow-hidden w-full my-10">
+    <div className={`max-w-[1540px] mx-auto px-4 md:px-8 ${className || ""}`}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border border-gray-200 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white divide-y lg:divide-y-0 lg:divide-x divide-gray-100 overflow-hidden w-full my-10">
         {features.map((feature, index) => (
           <div
             key={index}
-            className="group flex items-center justify-center gap-7 px-8 py-10 lg:py-12 hover:bg-gray-50/40 transition-colors duration-300"
+            className={`group flex items-center justify-center gap-7 px-4 sm:px-8 py-10 lg:py-12 hover:bg-gray-50/40 transition-colors duration-300 ${index === 2 ? "md:col-span-2 lg:col-span-1" : ""}`}
           >
             <div className="w-16 h-16 flex items-center justify-center flex-shrink-0 bg-blue-50/80 rounded-full transition-transform duration-300 group-hover:scale-110">
               <feature.icon

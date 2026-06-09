@@ -11,7 +11,7 @@ const categories = [
 export default function CategoryGrid() {
   return (
     <section className="w-full">
-      <div className="container-main mx-auto px-6 py-0">
+      <div className="max-w-[1540px] mx-auto px-4 md:px-8 py-0">
         <h2 className="text-[22px] font-bold text-[#1a1a1a] text-center mb-8">
           Our Categories
         </h2>
@@ -28,6 +28,7 @@ export default function CategoryGrid() {
                   alt={c.label}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  quality={90}
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
               </div>

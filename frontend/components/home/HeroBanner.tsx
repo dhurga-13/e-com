@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const SLIDES = [
@@ -8,7 +9,8 @@ const SLIDES = [
     id: 1,
     tag: "SUMMER COLLECTION 2024",
     title: ["SUMMER", "SEASON'S"],
-    subtitle: "Up to 50% off on the latest summer styles. Discover fresh arrivals and trending looks.",
+    subtitle:
+      "Up to 50% off on the latest summer styles. Discover fresh arrivals and trending looks.",
     cta: "SHOP NOW",
     bgColor: "#c8dce8",
     image: "/hero/slide1.jpg",
@@ -18,7 +20,8 @@ const SLIDES = [
     id: 2,
     tag: "NEW ARRIVALS",
     title: ["FRESH &", "TRENDY"],
-    subtitle: "Explore our new arrivals — handpicked styles to keep you ahead of the fashion curve.",
+    subtitle:
+      "Explore our new arrivals — handpicked styles to keep you ahead of the fashion curve.",
     cta: "DISCOVER MORE",
     bgColor: "#e8d5c8",
     image: "/hero/slide2.jpg",
@@ -45,45 +48,54 @@ export default function HeroBanner() {
 
   useEffect(() => {
     timerRef.current = setTimeout(next, 5000);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current]);
 
   const slide = SLIDES[current];
 
   return (
-    <div className="w-full h-[520px] relative overflow-hidden">
-      
+    <div className="w-full h-[320px] sm:h-[420px] md:h-[520px] relative overflow-hidden">
       {/* Background */}
-      <div
-        className={`absolute inset-0 transition-opacity duration-500 ${transitioning ? "opacity-0" : "opacity-100"}`}
-        style={{
-          backgroundImage: slide.image ? `url(${slide.image})` : undefined,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundColor: slide.bgColor,
-        }}
-      />
+      <div className="absolute inset-0">
+        <Image
+          src={slide.image}
+          alt={slide.tag}
+          fill
+          priority
+          quality={100}
+          sizes="100vw"
+          className={`object-cover transition-opacity duration-500 ${transitioning ? "opacity-0" : "opacity-100"}`}
+        />
+      </div>
       <div className="absolute inset-0 bg-black/15 z-[1]" />
 
       {/* Content */}
       <div
         className={`absolute inset-0 z-[2] flex flex-col items-center justify-center text-center px-6 transition-all duration-500 ${
-          transitioning ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
+          transitioning
+            ? "opacity-0 translate-y-4"
+            : "opacity-100 translate-y-0"
         }`}
       >
         <p className="text-white text-[13px] font-semibold tracking-[6px] uppercase mb-4 opacity-90">
           {slide.tag}
         </p>
-        <h1 className="text-white font-black leading-[1] mb-6 drop-shadow-sm" style={{ fontSize: "clamp(44px, 6vw, 72px)" }}>
-          {slide.title[0]}<br />{slide.title[1]}
+        <h1
+          className="text-white font-black leading-[1.1] mb-6 drop-shadow-sm px-4"
+          style={{ fontSize: "clamp(32px, 6vw, 72px)" }}
+        >
+          {slide.title[0]}
+          <br />
+          {slide.title[1]}
         </h1>
         <p className="text-white/90 text-[15px] max-w-[480px] leading-relaxed mb-8">
           {slide.subtitle}
         </p>
         <button
-          className="bg-[#1a1a1a] text-white text-[12px] font-bold tracking-[3px] uppercase px-14 py-4 hover:bg-[#1565C0] transition-colors duration-300 cursor-pointer"
+          className="bg-[#1a1a1a] text-white text-[12px] font-bold tracking-[3px] uppercase px-4 sm:px-8 md:px-14 py-3 md:py-4 hover:bg-[#1565C0] transition-colors duration-300 cursor-pointer"
           suppressHydrationWarning
         >
           {slide.cta} →

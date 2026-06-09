@@ -43,8 +43,8 @@ export default function FeaturedArticles() {
   }, []);
 
   return (
-    <section className="w-full pt-0 pb-16">
-      <div className="max-w-[1540px] mx-auto px-8">
+    <section className="w-full pt-0 pb-16 overflow-hidden">
+      <div className="max-w-[1540px] mx-auto px-4 md:px-8">
         <h2 className="text-[22px] font-bold text-[#1a1a1a] text-center mb-8">
           Featured Articles
         </h2>
@@ -70,6 +70,7 @@ export default function FeaturedArticles() {
                       alt={article.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      quality={90}
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   </div>

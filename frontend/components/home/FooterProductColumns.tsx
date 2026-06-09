@@ -31,8 +31,8 @@ const DUMMY = [
 export default function FooterProductColumns() {
   return (
     <section className="w-full py-16 bg-white">
-      <div className="max-w-[1540px] mx-auto px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="max-w-[1540px] mx-auto px-4 md:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
           <div>
             <h3 className="text-[16px] font-bold text-[#1a1a1a] uppercase mb-6 pb-3 border-b border-gray-200">
               Sale Products

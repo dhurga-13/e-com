@@ -26,8 +26,8 @@ export default function BrandLogos() {
   }, []);
 
   return (
-    <section className="w-full py-12 border-t border-b border-gray-100 bg-white">
-      <div className="max-w-[1540px] mx-auto px-8">
+    <section className="w-full py-12 border-t border-b border-gray-100 bg-white overflow-hidden">
+      <div className="max-w-[1540px] mx-auto px-4 md:px-8">
         {mounted && (
           <Swiper
             modules={[Autoplay]}
@@ -38,11 +38,11 @@ export default function BrandLogos() {
               disableOnInteraction: false,
             }}
             breakpoints={{
-              0: { slidesPerView: 2, spaceBetween: 30 },
-              640: { slidesPerView: 3, spaceBetween: 40 },
-              768: { slidesPerView: 4, spaceBetween: 50 },
-              1024: { slidesPerView: 5, spaceBetween: 60 },
-              1280: { slidesPerView: 6, spaceBetween: 70 },
+              0: { slidesPerView: 2, spaceBetween: 20 }, // Adjusted spaceBetween
+              640: { slidesPerView: 3, spaceBetween: 30 }, // Adjusted spaceBetween
+              768: { slidesPerView: 4, spaceBetween: 40 }, // Adjusted spaceBetween
+              1024: { slidesPerView: 5, spaceBetween: 50 }, // Adjusted spaceBetween
+              1280: { slidesPerView: 6, spaceBetween: 60 }, // Adjusted spaceBetween
             }}
             allowTouchMove={false}
             className="brand-swiper flex items-center"
@@ -52,11 +52,15 @@ export default function BrandLogos() {
                 key={index} // Use index as key for duplicated static array
                 className="flex justify-center items-center"
               >
-                <div className="relative h-12 w-32 group-hover:opacity-100 transition-opacity duration-300 grayscale group-hover:grayscale-0">
+                <div className="relative h-12 w-24 sm:w-32 group-hover:opacity-100 transition-opacity duration-300 grayscale group-hover:grayscale-0">
+                  {" "}
+                  {/* Adjusted width for mobile */}
                   <Image
                     src={brand.image}
                     alt={brand.name}
                     fill
+                    sizes="(max-width: 768px) 33vw, 15vw"
+                    quality={90}
                     className="object-contain"
                   />
                 </div>

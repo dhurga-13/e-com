@@ -60,8 +60,8 @@ export default function BestSellers() {
   }, []);
 
   return (
-    <section className="w-full pt-0 pb-16">
-      <div className="max-w-[1540px] mx-auto px-8">
+    <section className="w-full pt-0 pb-16 overflow-hidden">
+      <div className="max-w-[1540px] mx-auto px-4 md:px-8">
         <h2 className="text-[22px] font-bold text-[#1a1a1a] text-center pt-4 mb-8">
           Best Sellers
         </h2>

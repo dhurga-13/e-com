@@ -3,6 +3,11 @@
 /* ===== Google Font: Poppins ===== */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap");
 
+@layer base {
+  /* Ensure @import order is valid in final CSS output */
+}
+
+
 /* ===== Design Tokens (Tailwind CSS v4 Theme) ===== */
 :root {
   --font-poppins: "Poppins", sans-serif;
@@ -54,7 +59,7 @@
 
 html {
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -62,8 +67,25 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Outfit', sans-serif;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
+
+/* Next.js root (defensive) */
+#__next,
+.page-wrapper {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Utility: hide scrollbars but keep scroll functionality */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 
 /* ===== Selection Styling ===== */
 ::selection {
