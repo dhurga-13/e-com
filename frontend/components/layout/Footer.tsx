@@ -30,12 +30,12 @@ export default function Footer() {
                   suppressHydrationWarning
                   type="email"
                   placeholder="Email address here..."
-                  className="flex-1 px-4 bg-[#333] border border-[#444] text-[#999] placeholder-gray-500 focus:outline-none focus:border-[#2d5eff] transition-colors"
+                  className="flex-1 min-w-0 px-4 bg-[#333] border border-[#444] text-[#999] placeholder-gray-500 focus:outline-none focus:border-[#2d5eff] transition-colors"
                 />
                 <button
                   suppressHydrationWarning
                   type="submit"
-                  className="px-8 bg-[#2d5eff] text-white font-bold uppercase tracking-widest text-[13px] hover:bg-[#254fdb] transition-colors"
+                  className="px-4 sm:px-8 bg-[#2d5eff] text-white font-bold uppercase tracking-widest text-[13px] hover:bg-[#254fdb] transition-colors"
                 >
                   Subscribe
                 </button>
