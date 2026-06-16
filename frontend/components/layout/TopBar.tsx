@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, CircleHelp, MapPin, User } from "lucide-react";
+import Link from "next/link";
 
 interface DropdownProps {
   label: string;
@@ -67,6 +68,33 @@ function Dropdown({ label, options, selected, onSelect }: DropdownProps) {
 export default function TopBar() {
   const [currency, setCurrency] = useState("USD");
   const [language, setLanguage] = useState("ENG");
+  const [user, setUser] = useState<{ name: string } | null>(null);
+
+  useEffect(() => {
+    const checkUser = () => {
+      const savedUser = localStorage.getItem("riode_user");
+      if (savedUser) {
+        setUser(JSON.parse(savedUser));
+      } else {
+        setUser(null);
+      }
+    };
+
+    checkUser();
+    // Listen for login/logout events within the same tab or across tabs
+    window.addEventListener("auth_change", checkUser);
+    window.addEventListener("storage", checkUser);
+    return () => {
+      window.removeEventListener("auth_change", checkUser);
+      window.removeEventListener("storage", checkUser);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("riode_user");
+    setUser(null);
+    window.dispatchEvent(new Event("auth_change"));
+  };
 
   return (
     <div
@@ -131,18 +159,33 @@ export default function TopBar() {
               Need Help
             </a>
 
-            {/* Sign In / Register */}
-            <a
-              href="/login"
-              className="group flex items-center gap-2 text-[13px] font-normal text-[#4b5563] pl-5"
-              id="topbar-login-register"
-            >
+            {/* User Account / Logout */}
+            <div className="flex items-center gap-2 text-[13px] font-normal text-[#4b5563] pl-5">
               <User
                 className="w-[19px] h-[19px] text-[#334155]"
                 strokeWidth={1.7}
               />
-              <span>Sign in / Register</span>
-            </a>
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <span className="font-semibold text-black uppercase tracking-tight">
+                    {user.name}
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-[11px] font-bold uppercase hover:text-red-600 transition-colors border-l border-gray-300 pl-3"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="hover:text-black transition-colors"
+                >
+                  Sign in / Register
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
