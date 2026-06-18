@@ -1,8 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  ChevronLeft,
+  Loader2,
+} from "lucide-react";
+
+import TopBar from "@/components/layout/TopBar";
+import MainHeader from "@/components/layout/MainHeader";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 type Step = "email" | "otp" | "reset";
 
