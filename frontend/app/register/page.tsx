@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -30,38 +31,44 @@ export default function RegisterPage() {
 
     setLoading(true);
 
-    // Simulating a backend database using localStorage
-    setTimeout(() => {
-      try {
-        const existingUsers = JSON.parse(
-          localStorage.getItem("riode_registered_users") || "[]",
-        );
-
-        // Check if user already exists
-        if (existingUsers.some((u: any) => u.email === formData.email)) {
-          setError("User with this email already exists.");
-          setLoading(false);
-          return;
-        }
-
-        // Add new user to the "database"
-        existingUsers.push({
-          username: formData.username,
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.username,
           email: formData.email,
           password: formData.password,
-        });
+        }),
+      });
 
-        localStorage.setItem(
-          "riode_registered_users",
-          JSON.stringify(existingUsers),
-        );
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Registration failed");
         setLoading(false);
-        router.push("/login");
-      } catch (err) {
-        setError("An unexpected error occurred. Please try again.");
-        setLoading(false);
+        return;
       }
-    }, 1500);
+
+      const loginRes = await signIn("credentials", {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (loginRes?.error) {
+        setError("Failed to login after registration.");
+        setLoading(false);
+      } else {
+        router.push("/");
+        router.refresh();
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (

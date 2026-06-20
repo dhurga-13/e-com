@@ -1,18 +1,7 @@
-export type Product = {
-  id: string
-  image: string
-  name: string
-  category: string
-  price: number
-  oldPrice?: number
-  rating: number
-  reviews: number
-  badge?: 'NEW' | '25% OFF'
-  description: string
-  details: string[]
-}
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
-export const PRODUCTS: Product[] = [
+const PRODUCTS = [
   {
     id: 'p1',
     image: '/products/product-1.jpg',
@@ -85,29 +74,27 @@ export const PRODUCTS: Product[] = [
       'Movement: Japanese quartz',
     ],
   },
-]
+];
 
-export function getProductById(id: string): Product | undefined {
-  return PRODUCTS.find(p => p.id === id)
-}
-
-// Keep the code simple: import prisma inside the functions or directly if this runs only on the server
-import { prisma } from "@/lib/prisma";
-
-export async function getAllProductsFromDB() {
-  try {
-    const products = await prisma.product.findMany();
-    return products as unknown as Product[];
-  } catch (error) {
-    return [];
+async function main() {
+  console.log('Start seeding...');
+  for (const p of PRODUCTS) {
+    const product = await prisma.product.upsert({
+      where: { id: p.id },
+      update: {},
+      create: p,
+    });
+    console.log(`Created product with id: ${product.id}`);
   }
+  console.log('Seeding finished.');
 }
 
-export async function getProductByIdFromDB(id: string) {
-  try {
-    const product = await prisma.product.findUnique({ where: { id } });
-    return product as unknown as Product | null;
-  } catch (error) {
-    return null;
-  }
-}
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

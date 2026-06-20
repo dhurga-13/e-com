@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, CircleHelp, MapPin, User } from "lucide-react";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 
 interface DropdownProps {
   label: string;
@@ -68,32 +69,12 @@ function Dropdown({ label, options, selected, onSelect }: DropdownProps) {
 export default function TopBar() {
   const [currency, setCurrency] = useState("USD");
   const [language, setLanguage] = useState("ENG");
-  const [user, setUser] = useState<{ name: string } | null>(null);
+  
+  const { data: session } = useSession();
+  const user = session?.user;
 
-  useEffect(() => {
-    const checkUser = () => {
-      const savedUser = localStorage.getItem("riode_user");
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
-      } else {
-        setUser(null);
-      }
-    };
-
-    checkUser();
-    // Listen for login/logout events within the same tab or across tabs
-    window.addEventListener("auth_change", checkUser);
-    window.addEventListener("storage", checkUser);
-    return () => {
-      window.removeEventListener("auth_change", checkUser);
-      window.removeEventListener("storage", checkUser);
-    };
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("riode_user");
-    setUser(null);
-    window.dispatchEvent(new Event("auth_change"));
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/" });
   };
 
   return (

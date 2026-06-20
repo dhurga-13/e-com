@@ -6,6 +6,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
+import { useSession } from "next-auth/react";
 import { Product } from "@/lib/products";
 
 type WishlistContextType = {
@@ -14,34 +15,78 @@ type WishlistContextType = {
   removeFromWishlist: (id: string) => void;
   isWishlisted: (id: string) => boolean;
   totalItems: number;
+  isLoading: boolean;
 };
 
 const WishlistContext = createContext<WishlistContextType | null>(null);
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
+  const { data: session, status } = useSession();
   const [items, setItems] = useState<Product[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load wishlist from localStorage on initial render
+  // Load initial data
   useEffect(() => {
-    const savedWishlist = localStorage.getItem("wishlist");
-    if (savedWishlist) {
-      setItems(JSON.parse(savedWishlist));
+    if (status === "loading") return;
+
+    if (session?.user) {
+      fetch("/api/wishlist")
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setItems(data.map((d) => d.product));
+          }
+          setLoaded(true);
+          setIsLoading(false);
+        })
+        .catch(() => {
+          setLoaded(true);
+          setIsLoading(false);
+        });
+    } else {
+      const savedWishlist = localStorage.getItem("wishlist");
+      if (savedWishlist) {
+        setItems(JSON.parse(savedWishlist));
+      }
+      setLoaded(true);
+      setIsLoading(false);
     }
-  }, []);
+  }, [session, status]);
 
-  // Save wishlist to localStorage whenever items change
+  // Save guest wishlist to localStorage
   useEffect(() => {
-    localStorage.setItem("wishlist", JSON.stringify(items));
-  }, [items]);
+    if (loaded && !session?.user) {
+      localStorage.setItem("wishlist", JSON.stringify(items));
+    }
+  }, [items, loaded, session]);
 
-  const addToWishlist = (product: Product) => {
-    setItems((prev) =>
-      prev.find((i) => i.id === product.id) ? prev : [...prev, product],
-    );
+  const addToWishlist = async (product: Product) => {
+    if (session?.user) {
+      const res = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id }),
+      });
+      if (res.ok) {
+        setItems((prev) =>
+          prev.find((i) => i.id === product.id) ? prev : [...prev, product],
+        );
+      }
+    } else {
+      setItems((prev) =>
+        prev.find((i) => i.id === product.id) ? prev : [...prev, product],
+      );
+    }
   };
 
-  const removeFromWishlist = (id: string) =>
+  const removeFromWishlist = async (id: string) => {
+    if (session?.user) {
+      await fetch(`/api/wishlist?productId=${id}`, { method: "DELETE" });
+    }
     setItems((prev) => prev.filter((i) => i.id !== id));
+  };
+
   const isWishlisted = (id: string) => items.some((i) => i.id === id);
   const totalItems = items.length;
 
@@ -53,6 +98,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         removeFromWishlist,
         isWishlisted,
         totalItems,
+        isLoading,
       }}
     >
       {children}

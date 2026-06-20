@@ -1,21 +1,6 @@
 // ===== E-Com Type Definitions =====
 
-export interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  price: number;
-  compareAtPrice?: number;
-  images: string[];
-  category: string;
-  tags: string[];
-  rating: number;
-  reviewCount: number;
-  inStock: boolean;
-  featured?: boolean;
-  createdAt: string;
-}
+export type { Product } from "@/lib/products";
 
 export interface Category {
   id: string;
@@ -24,11 +9,6 @@ export interface Category {
   description: string;
   image: string;
   productCount: number;
-}
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
 }
 
 export interface User {

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,39 +22,24 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    // Simulate network delay
-    setTimeout(() => {
-      try {
-        const existingUsers = JSON.parse(
-          localStorage.getItem("riode_registered_users") || "[]",
-        );
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
 
-        // Verify credentials properly against the simulated database
-        const matchedUser = existingUsers.find(
-          (u: any) => u.email === email && u.password === password,
-        );
-
-        if (matchedUser) {
-          // Save session data
-          localStorage.setItem(
-            "riode_user",
-            JSON.stringify({ name: matchedUser.username }),
-          );
-
-          // Trigger TopBar update
-          window.dispatchEvent(new Event("auth_change"));
-
-          setLoading(false);
-          router.push("/");
-        } else {
-          setError("Invalid email or password.");
-          setLoading(false);
-        }
-      } catch (err) {
-        setError("An unexpected error occurred. Please try again.");
+      if (res?.error) {
+        setError("Invalid email or password.");
         setLoading(false);
+      } else {
+        router.push("/");
+        router.refresh();
       }
-    }, 1000);
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
