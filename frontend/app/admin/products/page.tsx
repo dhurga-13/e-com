@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import { 
@@ -11,19 +9,25 @@ import {
   Trash2,
   Image as ImageIcon
 } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
-const products = [
-  { id: "PROD-001", name: "Nike Air Max 270", category: "Footwear", price: "$150.00", stock: 124, status: "In Stock" },
-  { id: "PROD-002", name: "Apple AirPods Pro", category: "Electronics", price: "$249.00", stock: 0, status: "Out of Stock" },
-  { id: "PROD-003", name: "Samsung Galaxy Watch", category: "Electronics", price: "$299.00", stock: 45, status: "In Stock" },
-  { id: "PROD-004", name: "Sony WH-1000XM4", category: "Electronics", price: "$348.00", stock: 12, status: "Low Stock" },
-  { id: "PROD-005", name: "Nintendo Switch OLED", category: "Gaming", price: "$349.99", stock: 89, status: "In Stock" },
-  { id: "PROD-006", name: "Levis 501 Original Fit", category: "Apparel", price: "$59.50", stock: 230, status: "In Stock" },
-  { id: "PROD-007", name: "Hydro Flask 32 oz", category: "Accessories", price: "$44.95", stock: 5, status: "Low Stock" },
-  { id: "PROD-008", name: "Logitech MX Master 3", category: "Electronics", price: "$99.99", stock: 67, status: "In Stock" },
-];
+export default async function AdminProducts() {
+  const dbProducts = await prisma.product.findMany({
+    orderBy: { createdAt: 'desc' }
+  });
 
-export default function AdminProducts() {
+  const products = dbProducts.map(product => {
+    const stock = 50; // Mocked stock since it's not in DB
+    return {
+      id: `PROD-${product.id.slice(-4).toUpperCase()}`,
+      name: product.name,
+      category: product.category,
+      price: `$${product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      stock: stock,
+      status: stock > 10 ? "In Stock" : stock > 0 ? "Low Stock" : "Out of Stock"
+    };
+  });
+
   return (
     <div className="space-y-6">
       
@@ -81,56 +85,62 @@ export default function AdminProducts() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {products.map((product, i) => (
-                <tr key={i} className="hover:bg-gray-50/50 transition-colors group">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-gray-400 shrink-0">
-                        <ImageIcon size={18} />
+              {products.length > 0 ? (
+                products.map((product, i) => (
+                  <tr key={i} className="hover:bg-gray-50/50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-gray-400 shrink-0 overflow-hidden">
+                          <ImageIcon size={18} />
+                        </div>
+                        <span className="text-sm font-medium text-gray-900">{product.name}</span>
                       </div>
-                      <span className="text-sm font-medium text-gray-900">{product.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{product.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{product.category}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{product.price}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{product.stock}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      product.status === 'In Stock' ? 'bg-emerald-100 text-emerald-800' : 
-                      product.status === 'Low Stock' ? 'bg-amber-100 text-amber-800' : 
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {product.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
-                        <Edit size={16} />
-                      </button>
-                      <button className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-                        <Trash2 size={16} />
-                      </button>
-                      <button className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors">
-                        <MoreHorizontal size={16} />
-                      </button>
-                    </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{product.id}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{product.category}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{product.price}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{product.stock}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        product.status === 'In Stock' ? 'bg-emerald-100 text-emerald-800' : 
+                        product.status === 'Low Stock' ? 'bg-amber-100 text-amber-800' : 
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {product.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                          <Edit size={16} />
+                        </button>
+                        <button className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                          <Trash2 size={16} />
+                        </button>
+                        <button className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors">
+                          <MoreHorizontal size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500 text-sm">
+                    No products found.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
         
         {/* Pagination */}
         <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-sm text-gray-500">Showing <span className="font-medium text-gray-900">1</span> to <span className="font-medium text-gray-900">8</span> of <span className="font-medium text-gray-900">24</span> results</p>
+          <p className="text-sm text-gray-500">Showing <span className="font-medium text-gray-900">1</span> to <span className="font-medium text-gray-900">{products.length}</span> of <span className="font-medium text-gray-900">{products.length}</span> results</p>
           <div className="flex gap-1">
             <button className="px-3 py-1 border border-gray-200 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50">Previous</button>
             <button className="px-3 py-1 bg-[#2d5eff] text-white rounded text-sm font-medium">1</button>
-            <button className="px-3 py-1 border border-gray-200 rounded text-sm text-gray-600 hover:bg-gray-50">2</button>
-            <button className="px-3 py-1 border border-gray-200 rounded text-sm text-gray-600 hover:bg-gray-50">3</button>
             <button className="px-3 py-1 border border-gray-200 rounded text-sm text-gray-600 hover:bg-gray-50">Next</button>
           </div>
         </div>

@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 const PRODUCTS = [
@@ -78,6 +79,29 @@ const PRODUCTS = [
 
 async function main() {
   console.log('Start seeding...');
+
+  const hashedPassword = await bcrypt.hash('password123', 10);
+
+  const user1 = await prisma.user.upsert({
+    where: { email: 'john@example.com' },
+    update: { password: hashedPassword },
+    create: {
+      name: 'John Doe',
+      email: 'john@example.com',
+      password: hashedPassword,
+    }
+  });
+
+  const user2 = await prisma.user.upsert({
+    where: { email: 'jane@example.com' },
+    update: { password: hashedPassword },
+    create: {
+      name: 'Jane Smith',
+      email: 'jane@example.com',
+      password: hashedPassword,
+    }
+  });
+
   for (const p of PRODUCTS) {
     const product = await prisma.product.upsert({
       where: { id: p.id },
@@ -86,6 +110,39 @@ async function main() {
     });
     console.log(`Created product with id: ${product.id}`);
   }
+
+  const existingOrders = await prisma.order.count();
+  if (existingOrders === 0) {
+    await prisma.order.create({
+      data: {
+        userId: user1.id,
+        amount: 150.00,
+        status: 'Completed',
+        createdAt: new Date(Date.now() - 2 * 60000),
+        items: {
+          create: [
+            { productId: 'p1', quantity: 1, price: 150.00 }
+          ]
+        }
+      }
+    });
+
+    await prisma.order.create({
+      data: {
+        userId: user2.id,
+        amount: 249.00,
+        status: 'Processing',
+        createdAt: new Date(Date.now() - 15 * 60000),
+        items: {
+          create: [
+            { productId: 'p4', quantity: 1, price: 249.00 }
+          ]
+        }
+      }
+    });
+    console.log('Created mock orders.');
+  }
+
   console.log('Seeding finished.');
 }
 

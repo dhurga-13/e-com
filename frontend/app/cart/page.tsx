@@ -3,12 +3,46 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react"; // Keep these imports
 import { useCart } from "@/context/CartContext"; // Keep this import
+import { placeOrder } from "@/app/actions/checkout";
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart } =
     useCart();
+  
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  const handleCheckout = async () => {
+    if (!session) {
+      alert("Please log in to place an order.");
+      router.push("/login?callbackUrl=/cart");
+      return;
+    }
+
+    if (items.length === 0) return;
+
+    setIsCheckingOut(true);
+    try {
+      const res = await placeOrder(items, totalPrice);
+      if (res?.error) {
+        alert(res.error);
+      } else if (res?.success) {
+        clearCart();
+        alert("Order placed successfully! You can view it on the admin dashboard.");
+        router.push("/admin/dashboard");
+      }
+    } catch (e) {
+      alert("Something went wrong while placing your order.");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -179,8 +213,12 @@ export default function CartPage() {
                 </div>
 
                 {/* Checkout button */}
-                <button className="w-full h-[52px] bg-[#1565C0] text-white text-[15px] font-black tracking-wide flex items-center justify-center gap-2 hover:bg-[#0D47A1] transition-colors mb-3">
-                  <ShoppingBag size={18} /> PROCEED TO CHECKOUT
+                <button 
+                  onClick={handleCheckout}
+                  disabled={isCheckingOut}
+                  className="w-full h-[52px] bg-[#1565C0] text-white text-[15px] font-black tracking-wide flex items-center justify-center gap-2 hover:bg-[#0D47A1] transition-colors mb-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  <ShoppingBag size={18} /> {isCheckingOut ? "PROCESSING..." : "PROCEED TO CHECKOUT"}
                 </button>
 
                 {/* Payment row */}

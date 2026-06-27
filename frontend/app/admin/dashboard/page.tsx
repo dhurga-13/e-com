@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { 
   TrendingUp, 
@@ -12,47 +10,72 @@ import {
   CreditCard,
   Package
 } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
-const stats = [
-  {
-    title: "Total Revenue",
-    value: "$45,231.89",
-    change: "+20.1%",
-    trend: "up",
-    icon: DollarSign,
-  },
-  {
-    title: "Orders",
-    value: "356",
-    change: "+8.2%",
-    trend: "up",
-    icon: ShoppingBag,
-  },
-  {
-    title: "Active Customers",
-    value: "2,420",
-    change: "-3.1%",
-    trend: "down",
-    icon: Users,
-  },
-  {
-    title: "Conversion Rate",
-    value: "3.24%",
-    change: "+1.2%",
-    trend: "up",
-    icon: TrendingUp,
-  },
-];
+export default async function AdminDashboard() {
+  // Fetch real data from the database
+  const totalRevenueData = await prisma.order.aggregate({
+    _sum: { amount: true },
+  });
+  const totalRevenue = totalRevenueData._sum.amount || 0;
 
-const recentOrders = [
-  { id: "#ORD-001", customer: "John Doe", product: "Nike Air Max 270", date: "2 mins ago", amount: "$150.00", status: "Completed" },
-  { id: "#ORD-002", customer: "Jane Smith", product: "Apple AirPods Pro", date: "15 mins ago", amount: "$249.00", status: "Processing" },
-  { id: "#ORD-003", customer: "Michael Brown", product: "Samsung Galaxy Watch", date: "1 hour ago", amount: "$299.00", status: "Pending" },
-  { id: "#ORD-004", customer: "Emily Davis", product: "Sony WH-1000XM4", date: "2 hours ago", amount: "$348.00", status: "Completed" },
-  { id: "#ORD-005", customer: "David Wilson", product: "Nintendo Switch OLED", date: "3 hours ago", amount: "$349.99", status: "Completed" },
-];
+  const totalOrders = await prisma.order.count();
+  const totalCustomers = await prisma.user.count();
 
-export default function AdminDashboard() {
+  // We could calculate conversion rate, but for now let's just show a static 3.24% or similar mock as it requires analytics
+  const conversionRate = 3.24;
+
+  const stats = [
+    {
+      title: "Total Revenue",
+      value: `$${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      change: "+20.1%", // Static for now, as calculating change requires historical data
+      trend: "up",
+      icon: DollarSign,
+    },
+    {
+      title: "Orders",
+      value: totalOrders.toString(),
+      change: "+8.2%",
+      trend: "up",
+      icon: ShoppingBag,
+    },
+    {
+      title: "Active Customers",
+      value: totalCustomers.toString(),
+      change: "-3.1%",
+      trend: "down",
+      icon: Users,
+    },
+    {
+      title: "Conversion Rate",
+      value: `${conversionRate}%`,
+      change: "+1.2%",
+      trend: "up",
+      icon: TrendingUp,
+    },
+  ];
+
+  const dbOrders = await prisma.order.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+    include: {
+      user: true,
+      items: {
+        include: { product: true }
+      }
+    }
+  });
+
+  const recentOrders = dbOrders.map(order => ({
+    id: `#ORD-${order.id.slice(-6).toUpperCase()}`,
+    customer: order.user.name,
+    product: order.items.length > 0 ? order.items[0].product.name + (order.items.length > 1 ? ` +${order.items.length - 1} more` : '') : 'Unknown Product',
+    date: order.createdAt.toLocaleDateString(),
+    amount: `$${order.amount.toFixed(2)}`,
+    status: order.status,
+  }));
+
   return (
     <div className="space-y-6">
       
@@ -131,9 +154,9 @@ export default function AdminDashboard() {
                 <Package size={18} />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">New order #ORD-001</p>
-                <p className="text-xs text-gray-500 mt-0.5">John Doe placed an order for Nike Air Max 270.</p>
-                <p className="text-xs text-gray-400 mt-1">2 mins ago</p>
+                <p className="text-sm font-medium text-gray-900">New order received</p>
+                <p className="text-xs text-gray-500 mt-0.5">Check recent orders table below.</p>
+                <p className="text-xs text-gray-400 mt-1">Recently</p>
               </div>
             </div>
             
@@ -144,9 +167,9 @@ export default function AdminDashboard() {
                 <CreditCard size={18} />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Payment received</p>
-                <p className="text-xs text-gray-500 mt-0.5">Payment of $348.00 received from Emily Davis.</p>
-                <p className="text-xs text-gray-400 mt-1">2 hours ago</p>
+                <p className="text-sm font-medium text-gray-900">Payment processed</p>
+                <p className="text-xs text-gray-500 mt-0.5">Automated payments processed.</p>
+                <p className="text-xs text-gray-400 mt-1">A while ago</p>
               </div>
             </div>
 
@@ -156,9 +179,9 @@ export default function AdminDashboard() {
                 <Users size={18} />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">New customer registered</p>
-                <p className="text-xs text-gray-500 mt-0.5">Michael Brown joined the platform.</p>
-                <p className="text-xs text-gray-400 mt-1">5 hours ago</p>
+                <p className="text-sm font-medium text-gray-900">System updated</p>
+                <p className="text-xs text-gray-500 mt-0.5">Database synced with new schema.</p>
+                <p className="text-xs text-gray-400 mt-1">Today</p>
               </div>
             </div>
           </div>
@@ -188,24 +211,32 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {recentOrders.map((order, i) => (
-                <tr key={i} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{order.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{order.customer}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{order.product}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{order.date}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{order.amount}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      order.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' : 
-                      order.status === 'Processing' ? 'bg-blue-100 text-blue-800' : 
-                      'bg-amber-100 text-amber-800'
-                    }`}>
-                      {order.status}
-                    </span>
+              {recentOrders.length > 0 ? (
+                recentOrders.map((order, i) => (
+                  <tr key={i} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{order.id}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{order.customer}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{order.product}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{order.date}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{order.amount}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        order.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' : 
+                        order.status === 'Processing' ? 'bg-blue-100 text-blue-800' : 
+                        'bg-amber-100 text-amber-800'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500 text-sm">
+                    No recent orders found.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

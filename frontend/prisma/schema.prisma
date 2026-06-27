@@ -16,6 +16,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   cartItems     CartItem[]
   wishlistItems WishlistItem[]
+  orders        Order[]
 }
 
 model Product {
@@ -33,6 +34,7 @@ model Product {
   createdAt   DateTime @default(now())
   cartItems     CartItem[]
   wishlistItems WishlistItem[]
+  orderItems    OrderItem[]
 }
 
 model CartItem {
@@ -54,4 +56,25 @@ model WishlistItem {
   productId String
 
   @@unique([userId, productId])
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  amount    Float
+  status    String      @default("Pending") // Pending, Processing, Completed, Cancelled
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  items     OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  price     Float
 }
