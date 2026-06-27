@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react"; // Keep these imports
 import { useCart } from "@/context/CartContext"; // Keep this import
 import { placeOrder } from "@/app/actions/checkout";
+import Script from "next/script";
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart } =
@@ -29,23 +30,84 @@ export default function CartPage() {
 
     setIsCheckingOut(true);
     try {
-      const res = await placeOrder(items, totalPrice);
-      if (res?.error) {
-        alert(res.error);
-      } else if (res?.success) {
-        clearCart();
-        alert("Order placed successfully! You can view it on the admin dashboard.");
-        router.push("/admin/dashboard");
+      // 1. Create Order
+      const resOrder = await fetch("/api/razorpay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: totalPrice }),
+        cache: "no-store",
+      });
+      const orderData = await resOrder.json();
+
+      if (orderData.error) {
+        alert(orderData.error);
+        setIsCheckingOut(false);
+        return;
       }
+
+      // Check if we are in pure demo mode
+      const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (keyId === "rzp_test_demo_key" || !keyId) {
+        alert("Demo Mode: Simulating successful Razorpay payment. Replace keys in .env to test actual Razorpay Modal.");
+        const res = await placeOrder(items, totalPrice);
+        if (res?.error) {
+          alert(res.error);
+        } else if (res?.success) {
+          clearCart();
+          alert("Order placed successfully! You can view it on the admin dashboard.");
+          router.push("/admin/dashboard");
+        }
+        setIsCheckingOut(false);
+        return;
+      }
+
+      // 2. Open Razorpay Modal
+      const options = {
+        key: keyId,
+        amount: orderData.amount,
+        currency: "INR",
+        name: "E-Com Demo",
+        description: "Test Transaction",
+        order_id: orderData.id,
+        handler: async function (response: any) {
+          // Payment Successful - Place Order
+          const res = await placeOrder(items, totalPrice);
+          if (res?.error) {
+            alert(res.error);
+          } else if (res?.success) {
+            clearCart();
+            alert("Payment successful! Order placed.");
+            router.push("/admin/dashboard");
+          }
+        },
+        prefill: {
+          name: session.user?.name || "Demo User",
+          email: session.user?.email || "demo@example.com",
+          contact: "9999999999",
+        },
+        theme: {
+          color: "#1565C0",
+        },
+      };
+
+      const rzp1 = new (window as any).Razorpay(options);
+      rzp1.on("payment.failed", function (response: any) {
+        alert("Payment failed: " + response.error.description);
+      });
+      rzp1.open();
     } catch (e) {
-      alert("Something went wrong while placing your order.");
+      alert("Something went wrong while initiating checkout.");
     } finally {
+      // Don't set isCheckingOut to false immediately if Razorpay is open,
+      // but since it's a popup, the user might close it. 
+      // For simplicity in this demo, we'll unset it after the modal opens or fails.
       setIsCheckingOut(false);
     }
   };
 
   return (
     <div className="w-full">
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       <main className="w-full min-h-[70vh] py-8 md:py-12 bg-[#f9f9f9]">
         <div className="max-w-[1540px] mx-auto px-4 sm:px-6 md:px-8">
           <h1 className="text-2xl md:text-[28px] font-black text-[#1a1a1a] mb-6 md:mb-8">
@@ -121,7 +183,7 @@ export default function CartPage() {
                           Price
                         </span>
                         <span className="text-sm md:text-[14px] font-semibold text-[#1a1a1a]">
-                          ${item.price.toFixed(2)}
+                          ₹{item.price.toFixed(2)}
                         </span>
                       </div>
 
@@ -159,7 +221,7 @@ export default function CartPage() {
                           Subtotal
                         </span>
                         <span className="text-base md:text-[16px] font-black text-[#1565C0]">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ₹{(item.price * item.quantity).toFixed(2)}
                         </span>
                       </div>
                     </div>
@@ -194,7 +256,7 @@ export default function CartPage() {
                   <div className="flex justify-between">
                     <span className="text-[14px] text-gray-500">Subtotal</span>
                     <span className="text-[14px] font-semibold text-[#1a1a1a]">
-                      ${totalPrice.toFixed(2)}
+                      ₹{totalPrice.toFixed(2)}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -207,7 +269,7 @@ export default function CartPage() {
                   <div className="flex justify-between items-center">
                     <span className="text-[16px] font-black">Total</span>
                     <span className="text-[20px] font-black text-[#1565C0]">
-                      ${totalPrice.toFixed(2)}
+                      ₹{totalPrice.toFixed(2)}
                     </span>
                   </div>
                 </div>

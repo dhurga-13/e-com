@@ -26,7 +26,7 @@ export default async function AdminCustomers() {
       email: user.email,
       phone: "N/A", // Phone is not in the current DB schema
       orders: ordersCount,
-      spent: `$${spentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      spent: `₹${spentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       status: ordersCount > 10 ? "VIP" : ordersCount > 0 ? "Active" : "Inactive",
       joined: user.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
     };

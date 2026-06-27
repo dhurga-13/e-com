@@ -69,7 +69,7 @@ export default function AddProduct() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
                 <input 
                   type="number" 
                   placeholder="0.00" 
@@ -77,7 +77,7 @@ export default function AddProduct() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Compare at Price ($)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Compare at Price (₹)</label>
                 <input 
                   type="number" 
                   placeholder="0.00" 

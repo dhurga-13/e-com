@@ -31,7 +31,7 @@ export default function MiniProductCard({
           {product.name}
         </h4>
         <span className="text-[15px] font-bold text-[#1a1a1a] mb-1">
-          ${product.price.toFixed(2)}
+          ₹{product.price.toFixed(2)}
         </span>
         <StarRating
           rating={product.rating}

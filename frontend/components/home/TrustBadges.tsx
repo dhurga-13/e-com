@@ -5,7 +5,7 @@ export default function TrustBadges({ className }: { className?: string }) {
     {
       icon: Truck,
       title: "Free Shipping & Return",
-      subtitle: "Free shipping on orders over $99",
+      subtitle: "Free shipping on orders over ₹99",
     },
     {
       icon: Clock,

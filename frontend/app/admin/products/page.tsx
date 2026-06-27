@@ -22,7 +22,7 @@ export default async function AdminProducts() {
       id: `PROD-${product.id.slice(-4).toUpperCase()}`,
       name: product.name,
       category: product.category,
-      price: `$${product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      price: `₹${product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       stock: stock,
       status: stock > 10 ? "In Stock" : stock > 0 ? "Low Stock" : "Out of Stock"
     };

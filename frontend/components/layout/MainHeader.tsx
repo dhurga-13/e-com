@@ -92,7 +92,7 @@ export default function MainHeader() {
                 Shopping Cart
               </p>
               <p className="text-[#1a1a1a] font-bold text-sm leading-none mt-1">
-                ${totalPrice.toFixed(2)}
+                ₹{totalPrice.toFixed(2)}
               </p>
             </div>
           </Link>

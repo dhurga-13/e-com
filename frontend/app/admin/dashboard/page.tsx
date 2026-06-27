@@ -28,7 +28,7 @@ export default async function AdminDashboard() {
   const stats = [
     {
       title: "Total Revenue",
-      value: `$${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: `₹${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       change: "+20.1%", // Static for now, as calculating change requires historical data
       trend: "up",
       icon: DollarSign,
@@ -72,7 +72,7 @@ export default async function AdminDashboard() {
     customer: order.user.name,
     product: order.items.length > 0 ? order.items[0].product.name + (order.items.length > 1 ? ` +${order.items.length - 1} more` : '') : 'Unknown Product',
     date: order.createdAt.toLocaleDateString(),
-    amount: `$${order.amount.toFixed(2)}`,
+    amount: `₹${order.amount.toFixed(2)}`,
     status: order.status,
   }));
 

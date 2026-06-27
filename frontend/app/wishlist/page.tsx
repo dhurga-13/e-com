@@ -93,7 +93,7 @@ export default function WishlistPage() {
                       </div>
                     </td>
                     <td className="px-4 py-4 text-[15px] font-bold text-[#1a1a1a]">
-                      ${item.price.toFixed(2)}
+                      ₹{item.price.toFixed(2)}
                     </td>
                     <td className="px-4 py-4">
                       <span className="bg-green-100 text-green-700 text-[11px] font-semibold px-3 py-1 rounded-full">

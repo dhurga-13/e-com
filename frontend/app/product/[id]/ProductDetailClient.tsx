@@ -131,11 +131,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
             <div className="flex items-center gap-3 mb-2">
               <span className="text-2xl md:text-[32px] font-bold text-[#c8232c]">
-                ${product.price.toFixed(2)}
+                ₹{product.price.toFixed(2)}
               </span>
               {product.oldPrice && (
                 <span className="text-[16px] text-gray-400 line-through">
-                  ${product.oldPrice.toFixed(2)}
+                  ₹{product.oldPrice.toFixed(2)}
                 </span>
               )}
             </div>
@@ -337,7 +337,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                           Free shipping
                         </p>
                         <p className="text-[12px] text-gray-500">
-                          On orders over $50.00
+                          On orders over ₹50.00
                         </p>
                       </div>
                     </div>
